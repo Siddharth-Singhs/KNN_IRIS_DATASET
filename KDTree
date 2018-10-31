@@ -1,0 +1,26 @@
+Since there are many possible ways to choose axis-aligned splitting planes, there are many different ways to construct k-d trees. The canonical method of k-d tree construction has the following constraints:[2]
+
+As one moves down the tree, one cycles through the axes used to select the splitting planes. (For example, in a 3-dimensional tree, the root would have an x-aligned plane, the root's children would both have y-aligned planes, the root's grandchildren would all have z-aligned planes, the root's great-grandchildren would all have x-aligned planes, the root's great-great-grandchildren would all have y-aligned planes, and so on.)
+Points are inserted by selecting the median of the points being put into the subtree, with respect to their coordinates in the axis being used to create the splitting plane. (Note the assumption that we feed the entire set of n points into the algorithm up-front.)
+This method leads to a balanced k-d tree, in which each leaf node is approximately the same distance from the root. However, balanced trees are not necessarily optimal for all applications.
+
+Note that it is not required to select the median point. In the case where median points are not selected, there is no guarantee that the tree will be balanced. To avoid coding a complex O(n) median-finding algorithm[3][4] or using an O(n log n) sort such as heapsort or mergesort to sort all n points, a popular practice is to sort a fixed number of randomly selected points, and use the median of those points to serve as the splitting plane. In practice, this technique often results in nicely balanced trees.
+
+Given a list of n points, the following algorithm uses a median-finding sort to construct a balanced k-d tree containing those points.
+
+
+function kdtree (list of points pointList, int depth)
+{
+    // Select axis based on depth so that axis cycles through all valid values
+    var int axis := depth mod k;
+        
+    // Sort point list and choose median as pivot element
+    select median by axis from pointList;
+        
+    // Create node and construct subtree
+    node.location := median;
+    node.leftChild := kdtree(points in pointList before median, depth+1);
+    node.rightChild := kdtree(points in pointList after median, depth+1);
+    return node;
+}
+It is common that points "after" the median include only the ones that are strictly greater than the median. For points that lie on the median, it is possible to define a "superkey" function that compares the points in all dimensions[non sequitur]. In some cases, it is acceptable to let points equal to the median lie on one side of the median, for example, by splitting the points into a "lesser than" subset and a "greater than or equal to" subset.
